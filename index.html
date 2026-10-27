@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ढीलक्स बस — Bus Driver Playlist</title>
+  <meta name="description" content="Ran Singh - Bus Driver Music Player - 90s Hindi Highway Radio.">
+  <meta name="theme-color" content="#1a0d0a">
+
+  <!-- Fonts (optional: the page still works without internet fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Poppins:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --amber: #ffb000;
+      --orange: #ff7a1a;
+      --cream: #ffe9c2;
+      --red: #c8372b;
+      --ink: #1a0d0a;
+      --glass: rgba(24, 12, 9, .72);
+      --muted: #d7bfa0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+
+    html { background: var(--ink); }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: "Poppins", "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ---------- Full-screen background image (unchanged) ---------- */
+    .bg {
+      position: fixed; inset: 0; z-index: -2;
+      background: #2b1a26 url("assets/bus.jpg") center center / cover no-repeat;
+      animation: drift 40s ease-in-out infinite alternate;
+    }
+    @keyframes drift { from { transform: scale(1); } to { transform: scale(1.05); } }
+    /* subtle dark overlay so text and controls stay readable */
+    .shade {
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 0%, rgba(10,4,3,.45) 100%),
+        linear-gradient(to bottom, rgba(10,4,3,.55), rgba(10,4,3,.2) 40%, rgba(10,4,3,.7));
+    }
+
+    /* ---------- Page layout ---------- */
+    .stage {
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: max(14px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+
+    .clock {
+      font-family: "Share Tech Mono", "Consolas", "Courier New", monospace;
+      font-size: clamp(1.1rem, 3.6vw, 1.6rem);
+      letter-spacing: .08em;
+      color: var(--amber);
+      padding: 6px 12px;
+      border: 1px solid rgba(255,176,0,.45);
+      border-radius: 10px;
+      background: rgba(20,9,6,.55);
+      text-shadow: 0 0 10px rgba(255,150,30,.7);
+      white-space: nowrap;
+    }
+    .clock .colon { animation: blink 1s steps(2, start) infinite; }
+    .clock small { font-size: .55em; margin-left: 6px; color: var(--cream); letter-spacing: .1em; }
+    @keyframes blink { to { visibility: hidden; } }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8px 0;
+      min-height: 0;
+    }
+    h1 {
+      font-family: "Rozha One", "Noto Serif Devanagari", "Nirmala UI", Mangal, "Kohinoor Devanagari", serif;
+      font-weight: 400;
+      font-size: clamp(2.8rem, min(13vw, 17vh), 8rem);
+      line-height: 1.15;
+      letter-spacing: .04em;
+      background: linear-gradient(to bottom, #fff3cf, var(--amber) 55%, var(--orange));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 3px 0 rgba(90,20,8,.6)) drop-shadow(0 0 26px rgba(255,130,30,.55));
+    }
+    /* the old Devanagari title, now a smaller line under the main heading */
+    .brand-hi {
+      font-family: "Rozha One", "Noto Serif Devanagari", "Nirmala UI", Mangal, "Kohinoor Devanagari", serif;
+      font-size: clamp(1.2rem, 4vw, 1.9rem);
+      line-height: 1.2;
+      color: var(--amber);
+      text-shadow: 0 2px 10px rgba(0,0,0,.8), 0 0 18px rgba(255,130,30,.45);
+    }
+    .kicker {
+      margin-top: 6px;
+      font-size: clamp(.95rem, 3.4vw, 1.5rem);
+      font-weight: 600;
+      letter-spacing: .28em;
+      color: var(--cream);
+      text-shadow: 0 2px 10px rgba(0,0,0,.8);
+    }
+    .sub {
+      margin-top: 4px;
+      font-size: clamp(.72rem, 2.4vw, 1rem);
+      letter-spacing: .3em;
+      color: var(--amber);
+      text-shadow: 0 2px 10px rgba(0,0,0,.8);
+    }
+
+    /* ---------- Voice Control ---------- */
+    .voice { width: min(1000px, 100%); margin: 6px auto 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .voice-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-height: 46px; padding: 8px 22px;
+      font: inherit; font-size: clamp(.85rem, 2.6vw, 1rem); font-weight: 500;
+      color: var(--cream);
+      background: rgba(20,9,6,.55);
+      border: 1px solid rgba(255,176,0,.6);
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background .2s, color .2s, transform .15s, box-shadow .2s;
+    }
+    .voice-btn:hover { background: rgba(255,176,0,.22); }
+    .voice-btn:active { transform: scale(.96); }
+    .voice-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    .voice-btn svg { width: 20px; height: 20px; fill: currentColor; display: block; }
+    .voice-btn.is-listening {
+      color: #2a1200;
+      background: linear-gradient(135deg, var(--amber), var(--orange));
+      border-color: transparent;
+      animation: listen 1.2s ease-in-out infinite;
+    }
+    @keyframes listen { 0%, 100% { box-shadow: 0 0 10px rgba(255,140,30,.5); } 50% { box-shadow: 0 0 26px rgba(255,140,30,.9); } }
+    .voice-msg { font-size: .85rem; line-height: 1.5; text-align: center; color: var(--cream); text-shadow: 0 2px 10px rgba(0,0,0,.9); }
+    .voice-msg.error { color: #ffb4a8; }
+
+    /* ---------- Three playlists ---------- */
+    .playlists {
+      width: min(1000px, 100%);
+      margin: 12px auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .pl-card {
+      padding: 14px 12px 12px;
+      text-align: center;
+      background: var(--glass);
+      border: 1px solid rgba(255,176,0,.35);
+      border-radius: 22px;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.2) inset;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .pl-card.is-playing { border-color: var(--amber); box-shadow: 0 18px 50px rgba(0,0,0,.6), 0 0 22px rgba(255,140,30,.45); }
+    .pl-title { font-size: clamp(.95rem, 2.4vw, 1.1rem); font-weight: 600; line-height: 1.3; margin-bottom: 10px; }
+    .pl-card.is-playing .pl-title { color: var(--amber); }
+
+    .ctl { display: flex; justify-content: center; gap: 8px; }
+    .cbtn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      min-width: 54px; font: inherit; color: var(--cream);
+      background: none; border: 0; cursor: pointer;
+    }
+    .cbtn .circle {
+      display: grid; place-items: center; width: 46px; height: 46px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,176,0,.45);
+      border-radius: 50%;
+      transition: background .2s, transform .15s, box-shadow .2s;
+    }
+    .cbtn:hover .circle { background: rgba(255,176,0,.25); }
+    .cbtn:active .circle { transform: scale(.92); }
+    .cbtn:focus-visible .circle { outline: 2px solid #fff; outline-offset: 3px; }
+    .cbtn svg { width: 22px; height: 22px; fill: currentColor; display: block; }
+    .cbtn .cap { font-size: .72rem; color: var(--muted); }
+    /* the Play button of the playlist that is playing */
+    .cbtn.is-on .circle {
+      color: #2a1200; border-color: transparent;
+      background: linear-gradient(135deg, var(--amber), var(--orange));
+      box-shadow: 0 0 18px rgba(255,140,30,.6);
+    }
+
+    /* short error / info message + "Open on YouTube" link */
+    .msg { margin-top: 10px; font-size: .82rem; line-height: 1.5; color: #ffb4a8; }
+    .msg a { margin-left: 6px; font-weight: 600; color: var(--amber); text-decoration: underline; white-space: nowrap; }
+
+    /* The YouTube players live here, kept OFF-SCREEN, so nothing of them is visible. */
+    .yt-hidden { position: absolute; left: -9999px; top: 0; width: 200px; pointer-events: none; }
+
+    /* ---------- Phones and tablets ---------- */
+    @media (max-width: 800px) {
+      .playlists { grid-template-columns: 1fr; gap: 12px; }
+    }
+    @media (max-width: 600px) {
+      .pl-card { border-radius: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <div class="shade" aria-hidden="true"></div>
+
+  <div class="stage">
+
+    <!-- Top bar: digital clock -->
+    <header class="topbar">
+      <div class="clock" id="clock" aria-label="Current time">--<span class="colon">:</span>--<small>--</small></div>
+    </header>
+
+    <!-- Hero -->
+    <main class="hero">
+      <h1> Royal Saurabh 5600</h1>
+      <p class="brand-hi" lang="hi">ढीलक्स बस</p>
+      <p class="kicker">BUS DRIVER MUSIC PLAYER</p>
+      <p class="sub">90s HINDI HIGHWAY RADIO</p>
+    </main>
+
+    <!-- Voice Control button + its message -->
+    <section class="voice" aria-label="Voice control">
+      <button class="voice-btn" id="voiceBtn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 003-3V6a3 3 0 10-6 0v5a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-3.08A7 7 0 0019 11z"/></svg>
+        <span>Voice Control</span>
+      </button>
+      <p class="voice-msg" id="voiceMsg" role="status" hidden></p>
+    </section>
+
+    <!-- The three playlist cards are created by the script below -->
+    <section class="playlists" id="playlists" aria-label="Playlists"></section>
+
+  </div>
+
+  <!-- The hidden YouTube players (one per playlist) are created inside this box. -->
+  <div class="yt-hidden" id="ytBox" aria-hidden="true"></div>
+
+  <script>
+    /* =====================================================================
+       YOUR PLAYLISTS  -  the ONLY place you need to edit to change a playlist.
+       Paste any normal YouTube link in "url".
+       ===================================================================== */
+    var PLAYLISTS = [
+      { name: "Playlist 1: 90s Hindi Songs", url: "https://www.youtube.com/watch?v=4GMIMevMn6Y&list=RD4GMIMevMn6Y" },
+      { name: "Playlist 2: Hindi Lo-Fi",     url: "https://www.youtube.com/watch?v=Hfyx0xybClo&list=RDHfyx0xybClo" },
+      { name: "Playlist 3: Bhojpuri Songs",  url: "https://www.youtube.com/watch?v=4mnrtxd_GhE&list=RD4mnrtxd_GhE" }
+    ];
+
+    /* Words the Voice Control listens for to pick each playlist (same order as above).
+       Spaces and dashes are ignored, so "lo-fi", "lo fi" and "lofi" are all the same. */
+    var VOICE_WORDS = [
+      ["90", "ninety", "nineties", "playlist1", "playlistone"],
+      ["lofi", "lowfi", "lofy", "playlist2", "playlisttwo"],
+      ["bhojpuri", "bojpuri", "bhojpur", "playlist3", "playlistthree"]
+    ];
+    /* ===================================================================== */
+
+
+    (function () {
+      "use strict";
+
+      var $ = function (id) { return document.getElementById(id); };
+
+      /* ---------- Icons ---------- */
+      var ICON = {
+        prev:  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h2v12H6zM20 6v12L9.5 12z"/></svg>',
+        play:  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
+        pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+        next:  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 6h2v12h-2zM4 6l10.5 6L4 18z"/></svg>'
+      };
+
+      /* ---------- Digital clock (unchanged) ---------- */
+      function tickClock() {
+        var d = new Date();
+        var h = d.getHours(), m = d.getMinutes();
+        var ap = h >= 12 ? "PM" : "AM";
+        h = h % 12 || 12;
+        $("clock").innerHTML = (h < 10 ? "0" : "") + h + '<span class="colon">:</span>' +
+                               (m < 10 ? "0" : "") + m + "<small>" + ap + "</small>";
+      }
+      tickClock();
+      setInterval(tickClock, 1000);
+
+      /* =================================================================
+         EACH PLAYLIST HAS ITS OWN SMALL "STATE" OBJECT (called pl below),
+         its own YouTube player and its own buttons. Nothing is shared,
+         so one playlist can never change another playlist's song.
+         ================================================================= */
+      var apiFailed = false;   // true if the YouTube script could not be loaded
+      var active = -1;         // the playlist the user used last (voice commands act on it)
+
+      function getParam(url, name) {
+        try { return new URL(url).searchParams.get(name); }
+        catch (e) { return null; }
+      }
+
+      var P = PLAYLISTS.map(function (d, i) {
+        d.videoId = getParam(d.url, "v");
+        d.listId  = getParam(d.url, "list");
+        var pl = {
+          i: i, data: d,
+          player: null, ready: false,
+          mode: d.listId ? "list" : "video",   // "list" = try the whole Mix, "video" = just the one song
+          fellBack: false,                     // already switched from "list" to "video"?
+          started: false, playing: false, failed: false, sawPlay: false,
+          pendingPlay: false,                  // user pressed Play before the player was ready
+          timer: null,
+          skipBad: { next: false, prev: false },   // skipping did not work for this Mix
+          el: {}
+        };
+        buildCard(pl);
+        return pl;
+      });
+
+      /* =================================================================
+         BUILD THE CARD (title, Previous / Play / Pause / Next, message)
+         ================================================================= */
+      function makeButton(pl, caption, icon, label, onClick) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "cbtn";
+        b.setAttribute("aria-label", label + " - " + pl.data.name);
+        b.innerHTML = '<span class="circle">' + icon + '</span><span class="cap">' + caption + "</span>";
+        b.addEventListener("click", onClick);
+        return b;
+      }
+
+      function buildCard(pl) {
+        var card = document.createElement("article");
+        card.className = "pl-card";
+
+        var h = document.createElement("h2");
+        h.className = "pl-title";
+        h.textContent = pl.data.name;
+
+        var ctl = document.createElement("div");
+        ctl.className = "ctl";
+        pl.el.prev  = makeButton(pl, "Previous", ICON.prev,  "Previous track", function () { skip(pl, -1); });
+        pl.el.play  = makeButton(pl, "Play",     ICON.play,  "Play",           function () { playPlaylist(pl); });
+        pl.el.pause = makeButton(pl, "Pause",    ICON.pause, "Pause",          function () { pausePlaylist(pl); });
+        pl.el.next  = makeButton(pl, "Next",     ICON.next,  "Next track",     function () { skip(pl, +1); });
+        [pl.el.prev, pl.el.play, pl.el.pause, pl.el.next].forEach(function (b) { ctl.appendChild(b); });
+
+        pl.el.msg = document.createElement("p");
+        pl.el.msg.className = "msg";
+        pl.el.msg.setAttribute("role", "status");
+        pl.el.msg.hidden = true;
+
+        card.appendChild(h); card.appendChild(ctl); card.appendChild(pl.el.msg);
+        $("playlists").appendChild(card);
+        pl.el.card = card;
+
+        /* a box for this playlist's hidden YouTube player */
+        var slot = document.createElement("div");
+        slot.id = "ytPlayer" + pl.i;
+        $("ytBox").appendChild(slot);
+      }
+
+      /* Show the right highlight for a playlist. */
+      function refresh(pl) {
+        pl.el.card.classList.toggle("is-playing", pl.playing);
+        pl.el.play.classList.toggle("is-on", pl.playing);
+      }
+
+      /* =================================================================
+         MESSAGES  (each playlist has its own, with an "Open on YouTube" link)
+         ================================================================= */
+      function clearMsg(pl) { pl.el.msg.hidden = true; pl.el.msg.textContent = ""; }
+
+      function showMsg(pl, text) {
+        pl.el.msg.textContent = text;
+        var link = document.createElement("a");
+        link.href = pl.data.url;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = "Open on YouTube";
+        pl.el.msg.appendChild(link);
+        pl.el.msg.hidden = false;
+      }
+
+      /* =================================================================
+         PLAY / PAUSE / SKIP
+         ================================================================= */
+      function isPlayingNow(pl) {
+        if (!pl.ready) return false;
+        try { var s = pl.player.getPlayerState(); return s === 1 || s === 3; }   // 1 = playing, 3 = buffering
+        catch (e) { return false; }
+      }
+
+      /* When one playlist starts, pause every other one. */
+      function pauseOthers(pl) {
+        P.forEach(function (o) {
+          if (o === pl) return;
+          o.pendingPlay = false;
+          if (isPlayingNow(o)) o.player.pauseVideo();
+        });
+      }
+
+      function playPlaylist(pl) {
+        active = pl.i;
+        clearMsg(pl);
+        if (apiFailed) { showMsg(pl, "Could not load YouTube. Check your internet connection."); return; }
+        if (!pl.ready) { pl.pendingPlay = true; return; }   // starts by itself when the player is ready
+
+        pauseOthers(pl);
+        if (pl.started && !pl.failed) pl.player.playVideo();   // resume where it was paused
+        else beginLoad(pl);                                    // first start (or retry after an error)
+      }
+
+      function pausePlaylist(pl) {
+        active = pl.i;
+        clearMsg(pl);
+        pl.pendingPlay = false;
+        if (pl.ready && pl.started) pl.player.pauseVideo();
+      }
+
+      /* First start: try the whole Mix; if YouTube refuses it, fall back to the single song. */
+      function beginLoad(pl) {
+        pl.started = true; pl.failed = false; pl.sawPlay = false;
+        if (pl.mode === "list") pl.player.loadPlaylist({ listType: "playlist", list: pl.data.listId, index: 0 });
+        else pl.player.loadVideoById(pl.data.videoId);
+        startWatchdog(pl);
+      }
+
+      function fallbackToSingleSong(pl) {
+        pl.mode = "video"; pl.fellBack = true;
+        pl.started = true; pl.failed = false; pl.sawPlay = false;
+        pl.player.loadVideoById(pl.data.videoId);
+        startWatchdog(pl);
+      }
+
+      /* If nothing starts within 5 seconds, try the single song, then tell the user. */
+      function startWatchdog(pl) {
+        clearTimeout(pl.timer);
+        pl.timer = setTimeout(function () {
+          if (pl.sawPlay || pl.failed) return;
+          if (pl.mode === "list") { fallbackToSingleSong(pl); return; }
+          pl.failed = true;
+          showMsg(pl, "The song did not start. Press Play again.");
+        }, 5000);
+      }
+
+      var SKIP_TEXT = "Skipping did not work: YouTube does not allow track skipping for this Mix in the embedded player.";
+
+      /* Next (dir = +1) and Previous (dir = -1) inside THIS playlist only. */
+      function skip(pl, dir) {
+        active = pl.i;
+        clearMsg(pl);
+        var key = dir > 0 ? "next" : "prev";
+        if (apiFailed) { showMsg(pl, "Could not load YouTube. Check your internet connection."); return; }
+        if (!pl.ready || !pl.started) { showMsg(pl, "Press Play first, then use Previous / Next."); return; }
+        if (pl.mode === "video" || pl.skipBad[key]) { showMsg(pl, SKIP_TEXT); return; }   // we already know it cannot skip
+
+        var before = snapshot(pl);
+        if (dir > 0) pl.player.nextVideo(); else pl.player.previousVideo();
+
+        /* Do not pretend: after a moment, check that the track really changed. */
+        setTimeout(function () {
+          var after = snapshot(pl);
+          if (after.video === before.video && after.index === before.index) {
+            pl.skipBad[key] = true;
+            showMsg(pl, SKIP_TEXT);
+          }
+        }, 1500);
+      }
+
+      /* Which track is the player on right now? */
+      function snapshot(pl) {
+        var s = { video: null, index: null };
+        try { s.video = pl.player.getVideoData().video_id; } catch (e) {}
+        try { s.index = pl.player.getPlaylistIndex(); } catch (e) {}
+        return s;
+      }
+
+      /* =================================================================
+         YOUTUBE IFRAME PLAYER API  (official)
+         https://developers.google.com/youtube/iframe_api_reference
+         ================================================================= */
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.onerror = function () { apiFailed = true; };
+      document.head.appendChild(tag);
+
+      /* YouTube calls this function by itself when its script is ready. */
+      window.onYouTubeIframeAPIReady = function () {
+        var vars = { controls: 0, disablekb: 1, fs: 0, rel: 0, playsinline: 1 };
+        if (/^https?:$/.test(location.protocol)) vars.origin = location.origin;
+
+        P.forEach(function (pl) {
+          pl.player = new YT.Player("ytPlayer" + pl.i, {
+            width: "200",
+            height: "200",
+            playerVars: vars,
+            events: {
+              onReady: function () {
+                pl.ready = true;
+                if (pl.pendingPlay) { pl.pendingPlay = false; playPlaylist(pl); }
+              },
+              onStateChange: function (e) { onState(pl, e); },
+              onError: function (e) { onError(pl, e); }
+            }
+          });
+        });
+      };
+
+      /* Keep the highlight in sync with what the player is really doing. */
+      function onState(pl, e) {
+        if (e.data === 1) {                     // PLAYING
+          pl.sawPlay = true; pl.playing = true; pl.failed = false;
+          clearTimeout(pl.timer);
+          active = pl.i;
+          pauseOthers(pl);                      // safety: never two playlists at once
+        } else if (e.data === 3) {              // BUFFERING
+          pl.playing = true;
+        } else if (e.data === 2 || e.data === 0) {   // PAUSED or ENDED
+          pl.playing = false;
+        } else {
+          return;
+        }
+        refresh(pl);
+      }
+
+      /* The video cannot be played in the embedded player. */
+      function onError(pl, e) {
+        clearTimeout(pl.timer);
+        if (pl.mode === "list" && !pl.fellBack) { fallbackToSingleSong(pl); return; }   // Mix refused: try the single song
+
+        pl.playing = false;
+        pl.failed = true;
+        refresh(pl);
+
+        var text;
+        if (e.data === 2) {
+          text = "This YouTube link is not valid.";
+        } else if (e.data === 100) {
+          text = "This video was removed or is private.";
+        } else if (e.data === 101 || e.data === 150 || e.data === 153) {
+          text = "The owner of this video does not allow it to play on other websites.";
+          if (location.protocol === "file:") {
+            text += " (Tip: open this page with http://localhost, not by double-clicking the file.)";
+          }
+        } else {
+          text = "This song cannot be played here.";
+        }
+        showMsg(pl, text);
+      }
+
+      /* =================================================================
+         VOICE CONTROL  (browser Web Speech API - works in Chrome / Edge / Safari)
+         ================================================================= */
+      var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      var voiceBtn = $("voiceBtn");
+      var voiceMsg = $("voiceMsg");
+      var recognition = null;
+      var listening = false;
+
+      function voiceSay(text, isError) {
+        voiceMsg.textContent = text;
+        voiceMsg.classList.toggle("error", !!isError);
+        voiceMsg.hidden = !text;
+      }
+
+      /* Lower-case, and keep only letters and digits: "Play Hindi Lo-Fi" -> "playhindilofi" */
+      function squash(text) { return text.toLowerCase().replace(/[^a-z0-9]/g, ""); }
+
+      /* Understand one spoken phrase. Returns a short result text, or null if not understood. */
+      function runCommand(spoken) {
+        var t = squash(spoken);
+
+        if (/pause|stop/.test(t)) {
+          var last = active;              // pausing all should not change the "last used" playlist
+          P.forEach(pausePlaylist);
+          active = last;
+          return "Paused.";
+        }
+        if (/next|skip/.test(t)) {
+          if (active < 0) return "Start a playlist first.";
+          skip(P[active], +1);
+          return "Next song - " + P[active].data.name;
+        }
+        if (/previous|prev|back/.test(t)) {
+          if (active < 0) return "Start a playlist first.";
+          skip(P[active], -1);
+          return "Previous song - " + P[active].data.name;
+        }
+        for (var i = 0; i < VOICE_WORDS.length; i++) {
+          for (var j = 0; j < VOICE_WORDS[i].length; j++) {
+            if (t.indexOf(VOICE_WORDS[i][j]) >= 0) {
+              playPlaylist(P[i]);
+              return "Playing " + P[i].data.name;
+            }
+          }
+        }
+        if (/^(play|resume|start|continue)(music|song|songs)?$/.test(t)) {
+          playPlaylist(P[active < 0 ? 0 : active]);
+          return "Playing " + P[active].data.name;
+        }
+        return null;
+      }
+
+      function handleSpeech(heard) {                // heard = list of possible sentences
+        for (var k = 0; k < heard.length; k++) {
+          var result = runCommand(heard[k]);
+          if (result) { voiceSay("Heard “" + heard[k] + "” - " + result); return; }
+        }
+        voiceSay("Heard “" + heard[0] + "” - sorry, I did not understand. Try “Play 90s songs”, “Pause music” or “Next song”.", true);
+      }
+
+      function startListening() {
+        recognition = new SpeechRec();
+        recognition.lang = "en-IN";
+        recognition.interimResults = false;
+        recognition.continuous = false;
+        recognition.maxAlternatives = 3;
+
+        recognition.onstart = function () {
+          listening = true;
+          voiceBtn.classList.add("is-listening");
+          voiceSay("Listening… say “Play 90s songs”, “Pause music” or “Next song”.");
+        };
+        recognition.onresult = function (ev) {
+          var heard = [];
+          var res = ev.results[ev.results.length - 1];
+          for (var k = 0; k < res.length; k++) heard.push(res[k].transcript);
+          handleSpeech(heard);
+        };
+        recognition.onerror = function (ev) {
+          var why = ev.error;
+          if (why === "not-allowed" || why === "service-not-allowed") {
+            voiceSay("Microphone permission was denied. Allow the microphone in your browser, or use the buttons.", true);
+          } else if (why === "no-speech") {
+            voiceSay("I did not hear anything. Press Voice Control and try again.", true);
+          } else if (why === "audio-capture") {
+            voiceSay("No microphone was found. You can still use the buttons.", true);
+          } else if (why === "network") {
+            voiceSay("Voice recognition needs an internet connection. You can still use the buttons.", true);
+          } else if (why !== "aborted") {
+            voiceSay("Voice control stopped (" + why + "). You can still use the buttons.", true);
+          }
+        };
+        recognition.onend = function () {
+          listening = false;
+          voiceBtn.classList.remove("is-listening");
+        };
+
+        try { recognition.start(); }
+        catch (e) { voiceSay("Could not start the microphone. You can still use the buttons.", true); }
+      }
+
+      voiceBtn.addEventListener("click", function () {
+        if (!SpeechRec) {
+          voiceSay("Voice control is not supported in this browser. Please use Chrome or Edge, or use the buttons.", true);
+          return;
+        }
+        if (listening) { recognition.stop(); return; }
+        startListening();
+      });
+    })();
+  </script>
+</body>
+</html>
