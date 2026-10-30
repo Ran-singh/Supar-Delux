@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="google-site-verification" content="g8lMFM37c2Fqds3C3N6BeQleM2yT7SlGyIkYF10PxD0" />
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>ढीलक्स बस — Bus Driver Playlist</title>
@@ -38,7 +37,7 @@
     /* ---------- Full-screen background image (unchanged) ---------- */
     .bg {
       position: fixed; inset: 0; z-index: -2;
-      background: #2b1a26 url("bus.jpg") center center / cover no-repeat;
+      background: #2b1a26 url("assets/bus.jpg") center center / cover no-repeat;
       animation: drift 40s ease-in-out infinite alternate;
     }
     @keyframes drift { from { transform: scale(1); } to { transform: scale(1.05); } }
@@ -122,32 +121,23 @@
       text-shadow: 0 2px 10px rgba(0,0,0,.8);
     }
 
-    /* ---------- Voice Control ---------- */
-    .voice { width: min(1000px, 100%); margin: 6px auto 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .voice-btn {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      min-height: 46px; padding: 8px 22px;
-      font: inherit; font-size: clamp(.85rem, 2.6vw, 1rem); font-weight: 500;
-      color: var(--cream);
+    /* ---------- Instagram ID ---------- */
+    .insta {
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-top: 14px; padding: 8px 18px;
+      font-family: "Share Tech Mono", "Consolas", "Courier New", monospace;
+      font-size: clamp(.95rem, 3.2vw, 1.3rem);
+      letter-spacing: .06em;
+      color: var(--amber);
+      text-decoration: none;
+      border: 1px solid rgba(255,176,0,.45);
+      border-radius: 10px;
       background: rgba(20,9,6,.55);
-      border: 1px solid rgba(255,176,0,.6);
-      border-radius: 99px;
-      cursor: pointer;
-      transition: background .2s, color .2s, transform .15s, box-shadow .2s;
+      text-shadow: 0 0 10px rgba(255,150,30,.7);
+      transition: background .2s;
     }
-    .voice-btn:hover { background: rgba(255,176,0,.22); }
-    .voice-btn:active { transform: scale(.96); }
-    .voice-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-    .voice-btn svg { width: 20px; height: 20px; fill: currentColor; display: block; }
-    .voice-btn.is-listening {
-      color: #2a1200;
-      background: linear-gradient(135deg, var(--amber), var(--orange));
-      border-color: transparent;
-      animation: listen 1.2s ease-in-out infinite;
-    }
-    @keyframes listen { 0%, 100% { box-shadow: 0 0 10px rgba(255,140,30,.5); } 50% { box-shadow: 0 0 26px rgba(255,140,30,.9); } }
-    .voice-msg { font-size: .85rem; line-height: 1.5; text-align: center; color: var(--cream); text-shadow: 0 2px 10px rgba(0,0,0,.9); }
-    .voice-msg.error { color: #ffb4a8; }
+    .insta:hover { background: rgba(255,176,0,.22); }
+    .insta svg { width: 1.5em; height: 1.5em; flex: none; }
 
     /* ---------- Three playlists ---------- */
     .playlists {
@@ -233,16 +223,13 @@
       <p class="brand-hi" lang="hi">ढीलक्स बस</p>
       <p class="kicker">BUS DRIVER MUSIC PLAYER</p>
       <p class="sub">90s HINDI HIGHWAY RADIO</p>
+      <a class="insta" href="https://www.instagram.com/royal_saurabh_5600/" target="_blank" rel="noopener" aria-label="Instagram royal_saurabh_5600">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <span>royal_saurabh_5600</span>
+      </a>
     </main>
 
-    <!-- Voice Control button + its message -->
-    <section class="voice" aria-label="Voice control">
-      <button class="voice-btn" id="voiceBtn" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 003-3V6a3 3 0 10-6 0v5a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.92V21h2v-3.08A7 7 0 0019 11z"/></svg>
-        <span>Voice Control</span>
-      </button>
-      <p class="voice-msg" id="voiceMsg" role="status" hidden></p>
-    </section>
+    
 
     <!-- The three playlist cards are created by the script below -->
     <section class="playlists" id="playlists" aria-label="Playlists"></section>
@@ -263,13 +250,6 @@
       { name: "Playlist 3: Bhojpuri Songs",  url: "https://www.youtube.com/watch?v=4mnrtxd_GhE&list=RD4mnrtxd_GhE" }
     ];
 
-    /* Words the Voice Control listens for to pick each playlist (same order as above).
-       Spaces and dashes are ignored, so "lo-fi", "lo fi" and "lofi" are all the same. */
-    var VOICE_WORDS = [
-      ["90", "ninety", "nineties", "playlist1", "playlistone"],
-      ["lofi", "lowfi", "lofy", "playlist2", "playlisttwo"],
-      ["bhojpuri", "bojpuri", "bhojpur", "playlist3", "playlistthree"]
-    ];
     /* ===================================================================== */
 
 
@@ -304,7 +284,7 @@
          so one playlist can never change another playlist's song.
          ================================================================= */
       var apiFailed = false;   // true if the YouTube script could not be loaded
-      var active = -1;         // the playlist the user used last (voice commands act on it)
+      var active = -1;         // the playlist the user used last (lock-screen buttons act on it)
 
       function getParam(url, name) {
         try { return new URL(url).searchParams.get(name); }
@@ -322,6 +302,7 @@
           started: false, playing: false, failed: false, sawPlay: false,
           pendingPlay: false,                  // user pressed Play before the player was ready
           timer: null,
+          userPaused: false, wasPlaying: false,
           skipBad: { next: false, prev: false },   // skipping did not work for this Mix
           el: {}
         };
@@ -409,12 +390,14 @@
         P.forEach(function (o) {
           if (o === pl) return;
           o.pendingPlay = false;
+          o.userPaused = true;
           if (isPlayingNow(o)) o.player.pauseVideo();
         });
       }
 
       function playPlaylist(pl) {
         active = pl.i;
+        pl.userPaused = false;
         clearMsg(pl);
         if (apiFailed) { showMsg(pl, "Could not load YouTube. Check your internet connection."); return; }
         if (!pl.ready) { pl.pendingPlay = true; return; }   // starts by itself when the player is ready
@@ -428,6 +411,7 @@
         active = pl.i;
         clearMsg(pl);
         pl.pendingPlay = false;
+        pl.userPaused = true;
         if (pl.ready && pl.started) pl.player.pauseVideo();
       }
 
@@ -531,10 +515,14 @@
           pl.playing = true;
         } else if (e.data === 2 || e.data === 0) {   // PAUSED or ENDED
           pl.playing = false;
+          if (e.data === 2 && document.hidden) resumeIfStolen(pl);   // screen turned off
         } else {
           return;
         }
+        if (pl.playing) pl.wasPlaying = true;
+        else if (pl.userPaused) pl.wasPlaying = false;
         refresh(pl);
+        syncKeepAlive();
       }
 
       /* The video cannot be played in the embedded player. */
@@ -563,114 +551,60 @@
       }
 
       /* =================================================================
-         VOICE CONTROL  (browser Web Speech API - works in Chrome / Edge / Safari)
+         BACKGROUND PLAYBACK  (keeps music going when the screen is locked)
          ================================================================= */
-      var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-      var voiceBtn = $("voiceBtn");
-      var voiceMsg = $("voiceMsg");
-      var recognition = null;
-      var listening = false;
+      /* 1) A silent, looping sound tells the phone "this page is playing audio". */
+      function makeSilentWav() {
+        var rate = 8000, n = rate;                       // 1 second of silence
+        var buf = new ArrayBuffer(44 + n), v = new DataView(buf);
+        function str(o, t) { for (var i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); }
+        str(0, "RIFF"); v.setUint32(4, 36 + n, true); str(8, "WAVE"); str(12, "fmt ");
+        v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+        v.setUint32(24, rate, true); v.setUint32(28, rate, true);
+        v.setUint16(32, 1, true); v.setUint16(34, 8, true);
+        str(36, "data"); v.setUint32(40, n, true);
+        for (var i = 0; i < n; i++) v.setUint8(44 + i, 128);   // 128 = silence
+        return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+      }
+      var keepAlive = new Audio(makeSilentWav());
+      keepAlive.loop = true;
+      keepAlive.volume = 0.01;
 
-      function voiceSay(text, isError) {
-        voiceMsg.textContent = text;
-        voiceMsg.classList.toggle("error", !!isError);
-        voiceMsg.hidden = !text;
+      function syncKeepAlive() {
+        var any = P.some(function (p) { return p.playing; });
+        if (any) { var r = keepAlive.play(); if (r && r.catch) r.catch(function () {}); }
+        else keepAlive.pause();
+        if ("mediaSession" in navigator) {
+          navigator.mediaSession.playbackState = any ? "playing" : "paused";
+        }
       }
 
-      /* Lower-case, and keep only letters and digits: "Play Hindi Lo-Fi" -> "playhindilofi" */
-      function squash(text) { return text.toLowerCase().replace(/[^a-z0-9]/g, ""); }
-
-      /* Understand one spoken phrase. Returns a short result text, or null if not understood. */
-      function runCommand(spoken) {
-        var t = squash(spoken);
-
-        if (/pause|stop/.test(t)) {
-          var last = active;              // pausing all should not change the "last used" playlist
-          P.forEach(pausePlaylist);
-          active = last;
-          return "Paused.";
-        }
-        if (/next|skip/.test(t)) {
-          if (active < 0) return "Start a playlist first.";
-          skip(P[active], +1);
-          return "Next song - " + P[active].data.name;
-        }
-        if (/previous|prev|back/.test(t)) {
-          if (active < 0) return "Start a playlist first.";
-          skip(P[active], -1);
-          return "Previous song - " + P[active].data.name;
-        }
-        for (var i = 0; i < VOICE_WORDS.length; i++) {
-          for (var j = 0; j < VOICE_WORDS[i].length; j++) {
-            if (t.indexOf(VOICE_WORDS[i][j]) >= 0) {
-              playPlaylist(P[i]);
-              return "Playing " + P[i].data.name;
-            }
-          }
-        }
-        if (/^(play|resume|start|continue)(music|song|songs)?$/.test(t)) {
-          playPlaylist(P[active < 0 ? 0 : active]);
-          return "Playing " + P[active].data.name;
-        }
-        return null;
+      /* 2) Lock-screen / notification buttons (Play, Pause, Next, Previous). */
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: "Bus Driver Music Player",
+          artist: "90s Hindi Highway Radio"
+        });
+        var cur = function () { return P[active < 0 ? 0 : active]; };
+        navigator.mediaSession.setActionHandler("play",          function () { playPlaylist(cur()); });
+        navigator.mediaSession.setActionHandler("pause",         function () { pausePlaylist(cur()); });
+        navigator.mediaSession.setActionHandler("nexttrack",     function () { skip(cur(), +1); });
+        navigator.mediaSession.setActionHandler("previoustrack", function () { skip(cur(), -1); });
       }
 
-      function handleSpeech(heard) {                // heard = list of possible sentences
-        for (var k = 0; k < heard.length; k++) {
-          var result = runCommand(heard[k]);
-          if (result) { voiceSay("Heard “" + heard[k] + "” - " + result); return; }
-        }
-        voiceSay("Heard “" + heard[0] + "” - sorry, I did not understand. Try “Play 90s songs”, “Pause music” or “Next song”.", true);
+      /* 3) If the phone pauses the song by itself when the screen turns off,
+            start it again (but never if the user pressed Pause). */
+      function resumeIfStolen(pl) {
+        if (pl.userPaused || !pl.started || pl.failed) return;
+        [300, 1200, 3000].forEach(function (ms) {
+          setTimeout(function () {
+            if (!pl.userPaused && pl.ready && !isPlayingNow(pl)) pl.player.playVideo();
+          }, ms);
+        });
       }
-
-      function startListening() {
-        recognition = new SpeechRec();
-        recognition.lang = "en-IN";
-        recognition.interimResults = false;
-        recognition.continuous = false;
-        recognition.maxAlternatives = 3;
-
-        recognition.onstart = function () {
-          listening = true;
-          voiceBtn.classList.add("is-listening");
-          voiceSay("Listening… say “Play 90s songs”, “Pause music” or “Next song”.");
-        };
-        recognition.onresult = function (ev) {
-          var heard = [];
-          var res = ev.results[ev.results.length - 1];
-          for (var k = 0; k < res.length; k++) heard.push(res[k].transcript);
-          handleSpeech(heard);
-        };
-        recognition.onerror = function (ev) {
-          var why = ev.error;
-          if (why === "not-allowed" || why === "service-not-allowed") {
-            voiceSay("Microphone permission was denied. Allow the microphone in your browser, or use the buttons.", true);
-          } else if (why === "no-speech") {
-            voiceSay("I did not hear anything. Press Voice Control and try again.", true);
-          } else if (why === "audio-capture") {
-            voiceSay("No microphone was found. You can still use the buttons.", true);
-          } else if (why === "network") {
-            voiceSay("Voice recognition needs an internet connection. You can still use the buttons.", true);
-          } else if (why !== "aborted") {
-            voiceSay("Voice control stopped (" + why + "). You can still use the buttons.", true);
-          }
-        };
-        recognition.onend = function () {
-          listening = false;
-          voiceBtn.classList.remove("is-listening");
-        };
-
-        try { recognition.start(); }
-        catch (e) { voiceSay("Could not start the microphone. You can still use the buttons.", true); }
-      }
-
-      voiceBtn.addEventListener("click", function () {
-        if (!SpeechRec) {
-          voiceSay("Voice control is not supported in this browser. Please use Chrome or Edge, or use the buttons.", true);
-          return;
-        }
-        if (listening) { recognition.stop(); return; }
-        startListening();
+      document.addEventListener("visibilitychange", function () {
+        P.forEach(function (pl) { if (pl.wasPlaying) resumeIfStolen(pl); });
+        if (!document.hidden) syncKeepAlive();
       });
     })();
   </script>
